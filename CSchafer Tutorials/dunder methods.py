@@ -11,8 +11,17 @@ class Employee:
 
         Employee.num_of_employees += 1  # increase the number of employees by one each time an employee is created
 
+    def __repr__(self):  # used for debugging, should recreate the object
+        return f"Employee({self.first}, {self.last}, {self.pay})"
+
+    def __str__(self):  # for end user
+        return f"{self.fullname()}, {self.email}"
+
     def fullname(self):
         return self.first, self.last
+
+    def __add__(self, other):  # return the total pay when adding two employees together
+        return self.pay + other.pay
 
     def apply_raise(self):
         self.pay = int(self.pay * self.raise_amount)  # 4% raise
@@ -66,10 +75,10 @@ class Manager(Employee):
             print(emp.fullname())
 
 
+emp_1 = Employee("James", "Moro", 50000)
 dev_1 = Developer("James", "Moro", 50000, "Python")
 dev_2 = Developer("test", "name", 60000, "Java")
 mgr_1 = Manager("Sue", "Smith", 90000, employees=[dev_1])
 
-print(mgr_1.email)
-mgr_1.add_emp(dev_2)
-mgr_1.print_emps()
+
+print(dev_1 + mgr_1)
