@@ -35,9 +35,41 @@ class Employee:
         return True
 
 
-dev_1 = Employee("James", "Moro", 50000)
-dev_2 = Employee("test", "name", 60000)
+class Developer(Employee):  # Inherit from employee class
+    raise_amount = 1.10
+
+    def __init__(self, first, last, pay, prog_lang):
+        super().__init__(
+            first, last, pay
+        )  # This lets the Employee class handle the first 3 arguments
+        self.prog_lang = prog_lang
 
 
-print(dev_1.email)
-print(dev_2.email)
+class Manager(Employee):
+    def __init__(self, first, last, pay, employees=None):
+        super().__init__(first, last, pay)
+        if employees is None:
+            self.employees = []
+        else:
+            self.employees = employees
+
+    def add_emp(self, emp):
+        if emp not in self.employees:
+            self.employees.append(emp)
+
+    def remove_emp(self, emp):
+        if emp in self.employees:
+            self.employees.remove(emp)
+
+    def print_emps(self):
+        for emp in self.employees:
+            print(emp.fullname())
+
+
+dev_1 = Developer("James", "Moro", 50000, "Python")
+dev_2 = Developer("test", "name", 60000, "Java")
+mgr_1 = Manager("Sue", "Smith", 90000, employees=[dev_1])
+
+print(mgr_1.email)
+mgr_1.add_emp(dev_2)
+mgr_1.print_emps()
