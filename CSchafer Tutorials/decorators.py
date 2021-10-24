@@ -7,7 +7,7 @@ class Employee:
         self.first = first
         self.last = last
         self.pay = pay
-        self.email = first + "." + last + "@company.com"
+        # self.email = first + "." + last + "@company.com"
 
         Employee.num_of_employees += 1  # increase the number of employees by one each time an employee is created
 
@@ -17,8 +17,25 @@ class Employee:
     def __str__(self):  # for end user
         return f"{self.fullname()}, {self.email}"
 
+    @property
     def fullname(self):
         return self.first, self.last
+
+    @fullname.setter
+    def fullname(self, name):
+        first, last = name.split(" ")
+        self.first = first
+        self.last = last
+
+    @fullname.deleter
+    def fullname(self):
+        print("delete name")
+        self.first = None
+        self.last = None
+
+    @property
+    def email(self):
+        return f"{self.first}.{self.last}@email.com"
 
     def __add__(self, other):  # return the total pay when adding two employees together
         return self.pay + other.pay
@@ -80,5 +97,9 @@ dev_1 = Developer("James", "Moro", 50000, "Python")
 dev_2 = Developer("test", "name", 60000, "Java")
 mgr_1 = Manager("Sue", "Smith", 90000, employees=[dev_1])
 
+emp_1.fullname = "Jane Doe"
+print(emp_1.email)
 
-print(dev_1 + mgr_1)
+del emp_1.fullname
+
+print(emp_1.email)
