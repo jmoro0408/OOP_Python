@@ -73,13 +73,13 @@ class Pump:
         try:
             _max_efficiency_index = self.efficiency.index(max(self.efficiency))
             poly = self.generate_curve_equation(
-                self.flow, self.head, deg=3
+                self.efficiency_flow, self.head, deg=3
             )  # generating flow/head curve polynomial
-            _max_efficiency_head = poly(self.flow[_max_efficiency_index])
+            _max_efficiency_head = poly(self.efficiency_flow[_max_efficiency_index])
 
             best_efficiency_point = (
                 max(self.efficiency),
-                self.flow[_max_efficiency_index],
+                self.efficiency_flow[_max_efficiency_index],
                 _max_efficiency_head,
             )
         except AttributeError:
