@@ -209,16 +209,20 @@ class Pump:
         Returns:
             NPSHr plot on ax figure.
         """
-        if hasattr(self, "npshr_flow"):
+        if not hasattr(self, "npshr_flow"):
+            raise AttributeError(
+                "Error: Please attribute NPSHr data with this pump object before attempting to plot NPSHr"
+            )
+        elif not hasattr(self, "ax1"):
+            raise AttributeError(
+                "Error: Please call generate_plot method before adding an NPSHr plot"
+            )
+        else:
             self.ax1.plot(
                 self.npshr_flow, self.npshr, linestyle="-.", color="g", label="NPSHr"
             )
             self.ax1.legend()
             return self
-        else:
-            raise AttributeError(
-                "Error: Please add NPSHr data to the object before attempting to plot NPSHr"
-            )
 
     def show_plot(self):
         plt.show()
