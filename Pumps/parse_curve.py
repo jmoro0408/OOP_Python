@@ -2,10 +2,6 @@ import pandas as pd
 from pathlib import Path
 import json
 
-PUMP_CURVE_FILEPATH = (
-    r"/Users/jamesmoro/Documents/Python/OOP_Python/Pumps/pump_curves.xls"
-)
-
 
 def parse_xylect_curve(pump_curve_filepath: str):
     """Function parse the output of a xylect pump curve into a dictionary.
@@ -21,7 +17,7 @@ def parse_xylect_curve(pump_curve_filepath: str):
     Returns:
         dictionary: a dictionary containing all the information from the xylect .xls
     """
-    _pump_curve = pd.read_excel(PUMP_CURVE_FILEPATH)
+    _pump_curve = pd.read_excel(pump_curve_filepath)
     _pump_info_dict = {
         "Pump": _pump_curve["Unnamed: 1"][0],
         "Motor": _pump_curve["Unnamed: 1"][1],
@@ -48,8 +44,3 @@ def write_json(pump_dict: dict):
     with open(save_path, "w") as fp:
         json.dump(pump_dict, fp, indent=4)
     print(f"Pump curve data saved as data.json in {cwd} ")
-
-
-if __name__ == "__main__":
-    pump_curve = parse_xylect_curve(PUMP_CURVE_FILEPATH)
-    write_json(pump_curve)
