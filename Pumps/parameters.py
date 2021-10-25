@@ -171,6 +171,16 @@ class Pump:
     #####-----------Plotting Functions------------######
 
     def generate_plot(self, BEP=False, POR=False):
+        """Plots the 100% speed pump curve, with optional best efficiency and preferred
+        operating point markers
+
+        Args:
+            BEP (bool, optional): Plot best efficiency point. Defaults to False.
+            POR (bool, optional): Plot preferred operating range. Defaults to False.
+
+        Returns:
+            matplotlib ax object: plot of the 100% pump curve
+        """
         fig, self.ax1 = plt.subplots()
         self.ax1.plot(self.flow, self.head, label="100%")
         self.ax1.set_xlabel("Flow (L/s)")
@@ -189,6 +199,16 @@ class Pump:
         return self
 
     def add_npshr(self):
+        """adds an npshr plot to the plot object.
+        This method requires the generate_plot method is called first.
+        Also requires that some npshr data has been assigned to the pump object
+
+        Raises:
+            AttributeError: Raises error if no NPSHr data has been assigned to the pump object
+
+        Returns:
+            NPSHr plot on ax figure.
+        """
         if hasattr(self, "npshr_flow"):
             self.ax1.plot(
                 self.npshr_flow, self.npshr, linestyle="-.", color="g", label="NPSHr"
