@@ -14,5 +14,6 @@ if __name__ == "__main__":
     pump1 = Pump(make="Xylem", model=pump_curve["Pump"], motor=pump_curve["Motor"])
     pump1.define_pumpcurve(flow=pump_curve["Flow [l/s]"], head=pump_curve["Head [m]"])
     pump1.define_efficiency(efficiency=pump_curve["Overall Efficiency [%]"])
+    pump1.define_npshr(npshr=pump_curve["NPSHR-values [m]"])
 
-    print(pump1.generate_speed_curves()[60][0])
+    print(pump1.POR())

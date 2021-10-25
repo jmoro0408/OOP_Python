@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Pump:
 
     flow = None
@@ -45,7 +48,7 @@ class Pump:
             self.efficiency_flow = efficiency_flow
 
     def define_npshr(self, npshr: list, npshr_flow: list = None):
-        """Add an net positive suction head required (npshr) to the pump.
+        """Add a net positive suction head required (npshr) to the pump.
         By default this assume the npshr values correspond to the flows
         defined in the pump head/flow curve. However this can be overwritten by
         providing a new npshr_flow list to this method.
@@ -60,20 +63,24 @@ class Pump:
         if npshr_flow is not None:
             self.npshr_flow = npshr_flow
 
-    def generate_BEP(self):
-        """return the best efficiency point for a given pump
+    def BEP(self):
+        """return the best efficiency point for a given pump.
+        will return the best efficiency (%), followed by the corresponding flow and head
 
         Returns:
-            tuple: BEP of the pump in (flow, head)
+            tuple: BEP of the pump in (efficiency, flow, head)
         """
         try:
             _max_efficiency_index = self.efficiency.index(max(self.efficiency))
+            poly = self.generate_curve_equation(
+                self.flow, self.head, deg=3
+            )  # generating flow/head curve polynomial
+            _max_efficiency_head = poly(self.flow[_max_efficiency_index])
+
             best_efficiency_point = (
-                self.flow[_max_efficiency_index],
                 max(self.efficiency),
-            )
-            print(
-                f"The BEP is {round(max(self.efficiency),2)}%, occuring at {round(self.flow[_max_efficiency_index],2)} L/s"
+                self.flow[_max_efficiency_index],
+                _max_efficiency_head,
             )
         except AttributeError:
             print("Error: Please assign efficiency before calculating the BEP")
@@ -118,3 +125,44 @@ class Pump:
             _temp_dict = {speed: (flow, head)}
             speed_curve_dict.update(_temp_dict)
         return speed_curve_dict
+
+    def POR(self, speed=100):
+        """creates upper and lower preferred operating points for a given pump speed.
+        This assume HI guidance (lower = 70% BEP flow, upper = 120% BEP flow)
+
+        Returns:
+            tuple: tuple containing coordinates of upper and lower POR.
+            ([POR_upper_flow, POR_upper_head], [POR_lower_flow, POR_lower_head])
+
+        """
+        poly = self.generate_curve_equation(
+            self.flow, self.head, deg=3
+        )  # generating flow/head curve polynomial
+
+        _, BEP_flow, BEP_head = self.BEP()  # disregard the best efficiency (%)
+        POR_lower_flow = (
+            0.7 * BEP_flow
+        )  # POR lower range is 70% of the BEP (Hydraulic Institute)
+        POR_lower_head = poly(POR_lower_flow)
+        POR_upper_flow = (
+            1.2 * BEP_flow
+        )  # POR upper range is 120% of the BEP (Hydraulic Institute)
+        POR_upper_head = poly(POR_upper_flow)
+
+        return ([POR_upper_flow, POR_upper_head], [POR_lower_flow, POR_lower_head])
+
+    @staticmethod
+    def generate_curve_equation(x: list, y: list, deg=3):
+        """returns a 1d poly object for a given x and y
+
+        Args:
+            x (list): x values to curve fit
+            y (list): y values to curve fit
+            deg (int, optional): degree of curve. Defaults to 3.
+
+        Returns:
+            [poly1d]: np.poly1d object of curve
+        """
+        coeff = np.polyfit(x, y, deg)
+        poly = np.poly1d(coeff)
+        return poly
