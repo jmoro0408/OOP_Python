@@ -168,6 +168,8 @@ class Pump:
         poly = np.poly1d(coeff)
         return poly
 
+    #####-----------Plotting Functions------------######
+
     def generate_plot(self, BEP=False, POR=False, show=False):
         fig, self.ax1 = plt.subplots()
         self.ax1.plot(self.flow, self.head, label="100%")
@@ -186,7 +188,19 @@ class Pump:
         self.ax1.legend()
         if show:
             plt.show()
-        return self.ax1
+        return self
 
-    # def plot_npshr(self):
-    #     self.ax1 = self.generate_plot()
+    def add_npshr(self):
+        if hasattr(self, "npshr_flow"):
+            self.ax1.plot(
+                self.npshr_flow, self.npshr, linestyle="-.", color="g", label="NPSHr"
+            )
+            self.ax1.legend()
+            return self
+        else:
+            raise AttributeError(
+                "Error: Please add NPSHr data to the object before attempting to plot NPSHr"
+            )
+
+    def show_plot(self):
+        plt.show()
