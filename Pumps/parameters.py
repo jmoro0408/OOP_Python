@@ -79,3 +79,26 @@ class Pump:
         reduced_head = [head * ratio ** 2 for head in self.head]
 
         return reduced_flow, reduced_head
+
+    def generate_speed_curves(self, speeds: list = None):
+        """generate multiple speeds curves for a given list.
+        Default speeds are [90,80,70,60,50]% however these can be overwritted with a
+        provided list of speeds.
+
+        Args:
+            speeds (list, optional): List of speeds to create. If none provided,
+            speeds of [90,80,70,60,50]% are created. Defaults to None.
+
+        Returns:
+            dict: dictionary of speeds and corresponding head and flow.
+            dict has structure {speed: ([flow], [head])}
+        """
+        _speeds = [90, 80, 70, 60, 50]  # typical % speeds
+        if speeds is not None:
+            _speeds = speeds
+        speed_curve_dict = {}  # empty dict to hold our speed data.
+        for speed in _speeds:
+            flow, head = self.generate_affinity(new_speed=speed)
+            _temp_dict = {speed: (flow, head)}
+            speed_curve_dict.update(_temp_dict)
+        return speed_curve_dict

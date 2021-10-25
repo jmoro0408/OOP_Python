@@ -15,4 +15,4 @@ if __name__ == "__main__":
     pump1.define_pumpcurve(flow=pump_curve["Flow [l/s]"], head=pump_curve["Head [m]"])
     pump1.define_efficiency(efficiency=pump_curve["Overall Efficiency [%]"])
 
-    print(pump1.generate_BEP())
+    print(pump1.generate_speed_curves()[60][0])
