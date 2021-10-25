@@ -181,7 +181,7 @@ class Pump:
         Returns:
             matplotlib ax object: plot of the 100% pump curve
         """
-        fig, self.ax1 = plt.subplots()
+        self.fig, self.ax1 = plt.subplots()
         self.ax1.plot(self.flow, self.head, label="100%")
         self.ax1.set_xlabel("Flow (L/s)")
         self.ax1.set_ylabel("Head (m)")
@@ -195,7 +195,6 @@ class Pump:
                 POR_upper_flow, POR_upper_head, marker="x", color="r", label="POR"
             )
             self.ax1.plot(POR_lower_flow, POR_lower_head, marker="x", color="r")
-        self.ax1.legend()
         return self
 
     def add_npshr(self):
@@ -221,8 +220,31 @@ class Pump:
             self.ax1.plot(
                 self.npshr_flow, self.npshr, linestyle="-.", color="g", label="NPSHr"
             )
-            self.ax1.legend()
             return self
 
+    def add_efficiency(self):
+        self.ax2 = self.ax1.twinx()
+        self.ax2.plot(
+            self.efficiency_flow,
+            self.efficiency,
+            linestyle="--",
+            color="b",
+            label="Efficiency (%)",
+        )
+        self.ax2.set_ylabel("Efficiency (%)")
+        return self
+
+    def get_legends(self):
+        """gathering all the legend labels from all plots into one legend object
+
+        Returns:
+            matplotlib fig legend object: single legend object for all ax labels
+        """
+        lines_labels = [ax.get_legend_handles_labels() for ax in self.fig.axes]
+        lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+        return self.fig.legend(lines, labels, loc="upper right")
+
     def show_plot(self):
+
+        self.get_legends()
         plt.show()

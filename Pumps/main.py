@@ -16,4 +16,4 @@ if __name__ == "__main__":
     pump1.define_efficiency(efficiency=pump_curve["Overall Efficiency [%]"])
     pump1.define_npshr(npshr=pump_curve["NPSHR-values [m]"])
 
-    pump1.generate_plot(BEP=True, POR=True).show_plot()
+    pump1.generate_plot(BEP=True, POR=True).add_efficiency().add_npshr().show_plot()
