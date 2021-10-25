@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Pump:
@@ -63,7 +64,7 @@ class Pump:
         if npshr_flow is not None:
             self.npshr_flow = npshr_flow
 
-    def BEP(self):
+    def BEP(self, speed=100):
         """return the best efficiency point for a given pump.
         will return the best efficiency (%), followed by the corresponding flow and head
 
@@ -131,8 +132,8 @@ class Pump:
         This assume HI guidance (lower = 70% BEP flow, upper = 120% BEP flow)
 
         Returns:
-            tuple: tuple containing coordinates of upper and lower POR.
-            ([POR_upper_flow, POR_upper_head], [POR_lower_flow, POR_lower_head])
+            tuple: coordinates of upper and lower POR.
+            POR_upper_flow, POR_upper_head, POR_lower_flow, POR_lower_head
 
         """
         poly = self.generate_curve_equation(
@@ -149,7 +150,7 @@ class Pump:
         )  # POR upper range is 120% of the BEP (Hydraulic Institute)
         POR_upper_head = poly(POR_upper_flow)
 
-        return ([POR_upper_flow, POR_upper_head], [POR_lower_flow, POR_lower_head])
+        return POR_upper_flow, POR_upper_head, POR_lower_flow, POR_lower_head
 
     @staticmethod
     def generate_curve_equation(x: list, y: list, deg=3):
@@ -166,3 +167,26 @@ class Pump:
         coeff = np.polyfit(x, y, deg)
         poly = np.poly1d(coeff)
         return poly
+
+    def generate_plot(self, BEP=False, POR=False, show=False):
+        fig, self.ax1 = plt.subplots()
+        self.ax1.plot(self.flow, self.head, label="100%")
+        self.ax1.set_xlabel("Flow (L/s)")
+        self.ax1.set_ylabel("Head (m)")
+        self.ax1.set_title(f"Pump Curve for {self.fullname()}")
+        if BEP:
+            _, BEP_flow, BEP_head = self.BEP()
+            self.ax1.plot(BEP_flow, BEP_head, marker="o", label="BEP")
+        if POR:
+            POR_upper_flow, POR_upper_head, POR_lower_flow, POR_lower_head = self.POR()
+            self.ax1.plot(
+                POR_upper_flow, POR_upper_head, marker="x", color="r", label="POR"
+            )
+            self.ax1.plot(POR_lower_flow, POR_lower_head, marker="x", color="r")
+        self.ax1.legend()
+        if show:
+            plt.show()
+        return self.ax1
+
+    # def plot_npshr(self):
+    #     self.ax1 = self.generate_plot()
