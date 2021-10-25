@@ -27,6 +27,10 @@ def parse_xylect_curve(pump_curve_filepath: str):
     _pump_curve = _pump_curve.rename(columns=_pump_curve.iloc[0]).drop(
         _pump_curve.index[0]
     )  # swapping the header names with the first row
+    _pump_curve = _pump_curve.dropna()  # remove missing values
+    _pump_curve = _pump_curve.astype(
+        float
+    )  # have to convert values to float for future data wranging
 
     _pump_curve_dict = _pump_curve.to_dict(
         orient="list"
