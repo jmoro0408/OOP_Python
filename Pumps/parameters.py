@@ -39,6 +39,21 @@ class Pump:
             efficiency (list): pump efficiency list
             efficiency_flow (list, optional): Flow corrsponding to efficiency values. Defaults to None.
         """
+        self.efficiency = efficiency
+        self.efficiency_flow = self.flow
         if efficiency_flow is not None:
             self.efficiency_flow = efficiency_flow
-        self.efficiency = efficiency
+
+    def BEP(self):
+        """return the best efficiency point for a given pump
+
+        Returns:
+            tuple: BEP of the pump in (flow, head)
+        """
+        _max_efficiency_index = self.efficiency.index(max(self.efficiency))
+        best_efficiency_point = (self.flow[_max_efficiency_index], max(self.efficiency))
+        print(
+            f"The BEP is {round(max(self.efficiency),2)}%, occuring at {round(self.flow[_max_efficiency_index],2)} L/s"
+        )
+
+        return best_efficiency_point
