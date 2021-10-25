@@ -44,16 +44,38 @@ class Pump:
         if efficiency_flow is not None:
             self.efficiency_flow = efficiency_flow
 
-    def BEP(self):
+    def generate_BEP(self):
         """return the best efficiency point for a given pump
 
         Returns:
             tuple: BEP of the pump in (flow, head)
         """
-        _max_efficiency_index = self.efficiency.index(max(self.efficiency))
-        best_efficiency_point = (self.flow[_max_efficiency_index], max(self.efficiency))
-        print(
-            f"The BEP is {round(max(self.efficiency),2)}%, occuring at {round(self.flow[_max_efficiency_index],2)} L/s"
-        )
+        try:
+            _max_efficiency_index = self.efficiency.index(max(self.efficiency))
+            best_efficiency_point = (
+                self.flow[_max_efficiency_index],
+                max(self.efficiency),
+            )
+            print(
+                f"The BEP is {round(max(self.efficiency),2)}%, occuring at {round(self.flow[_max_efficiency_index],2)} L/s"
+            )
+        except AttributeError:
+            print("Error: Please assign efficiency before calculating the BEP")
+            return None
 
         return best_efficiency_point
+
+    def generate_affinity(self, new_speed: int):
+        """Uses pump affinity laws to create new pump/head curves based on an inputted speed.
+            This function expects the self.flow values to correspond to the pump at 100%.
+        Args:
+            new_speed (int): New pump speed to create flow/head values for
+
+        Returns:
+            (tuple): Tuple of two lists, containing reduced flow and reduced head values
+        """
+        ratio = new_speed / 100  # assumes original pump curve is at 100% speed
+        reduced_flow = [flow * ratio for flow in self.flow]
+        reduced_head = [head * ratio ** 2 for head in self.head]
+
+        return reduced_flow, reduced_head
