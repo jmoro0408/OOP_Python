@@ -37,12 +37,28 @@ class Pump:
 
         Args:
             efficiency (list): pump efficiency list
-            efficiency_flow (list, optional): Flow corrsponding to efficiency values. Defaults to None.
+            efficiency_flow (list, optional): Flow corresponding to efficiency values. Defaults to None.
         """
         self.efficiency = efficiency
         self.efficiency_flow = self.flow
         if efficiency_flow is not None:
             self.efficiency_flow = efficiency_flow
+
+    def define_npshr(self, npshr: list, npshr_flow: list = None):
+        """Add an net positive suction head required (npshr) to the pump.
+        By default this assume the npshr values correspond to the flows
+        defined in the pump head/flow curve. However this can be overwritten by
+        providing a new npshr_flow list to this method.
+
+        Args:
+            npshr (list): npshr values
+            npshr_flow (list, optional): flow corresponding to npshr. If none, this
+            defaults to the flow provided in the flow/head curve. Defaults to None.
+        """
+        self.npshr = npshr
+        self.npshr_flow = self.flow
+        if npshr_flow is not None:
+            self.npshr_flow = npshr_flow
 
     def generate_BEP(self):
         """return the best efficiency point for a given pump
