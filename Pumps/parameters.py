@@ -170,7 +170,7 @@ class Pump:
 
     #####-----------Plotting Functions------------######
 
-    def generate_plot(self, BEP=False, POR=False, show=False):
+    def generate_plot(self, BEP=False, POR=False):
         fig, self.ax1 = plt.subplots()
         self.ax1.plot(self.flow, self.head, label="100%")
         self.ax1.set_xlabel("Flow (L/s)")
@@ -186,8 +186,6 @@ class Pump:
             )
             self.ax1.plot(POR_lower_flow, POR_lower_head, marker="x", color="r")
         self.ax1.legend()
-        if show:
-            plt.show()
         return self
 
     def add_npshr(self):
