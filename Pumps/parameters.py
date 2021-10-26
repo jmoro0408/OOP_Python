@@ -1,6 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# TODO - fix legend
+# TODO - add duty point plotting option
+# TODO - Add system curve plotting option
+# TODO - add BEP and POR with optional fill for various speeds
+# TODO - add capability to pot custom speeds
+
 
 class Pump:
 
