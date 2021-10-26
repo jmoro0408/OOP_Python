@@ -253,7 +253,7 @@ class Pump:
         if default_speeds:
             speed_dict = self.generate_speed_curves()
         else:
-            raise NotImplementedError ("Currently only accepts default speed curves.")
+            raise NotImplementedError("Currently only accepts default speed curves.")
         for key, value in speed_dict.items():
             self.ax1.plot(
                 value[0], value[1], label=str(key) + "%", alpha=0.2, color="tab:blue"
@@ -268,8 +268,10 @@ class Pump:
         """
         lines_labels = [ax.get_legend_handles_labels() for ax in self.fig.axes]
         lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-        return self.fig.legend(lines, labels, loc="upper right")
+        return self.fig.legend(lines, labels, bbox_to_anchor=(1.15, 0.94))
 
     def show_plot(self):
+        plt.tight_layout()
         self.get_legends()
+
         plt.show()

@@ -7,6 +7,7 @@ PUMP_CURVE_FILEPATH = (
 
 
 if __name__ == "__main__":
+
     pump_curve = parse_xylect_curve(
         PUMP_CURVE_FILEPATH
     )  # parsing the xylect .xls pump curve info as a dict
@@ -16,4 +17,4 @@ if __name__ == "__main__":
     pump1.define_efficiency(efficiency=pump_curve["Overall Efficiency [%]"])
     pump1.define_npshr(npshr=pump_curve["NPSHR-values [m]"])
 
-    pump1.generate_plot(BEP=True, POR=True).add_npshr().plot_speeds(False).show_plot()
+    pump1.generate_plot(BEP=True, POR=True).add_npshr().plot_speeds().show_plot()
