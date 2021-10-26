@@ -223,6 +223,11 @@ class Pump:
             return self
 
     def add_efficiency(self):
+        """Plots pump efficiency on a secondary y axis
+
+        Returns:
+            matplotlib ax figure
+        """
         self.ax2 = self.ax1.twinx()
         self.ax2.plot(
             self.efficiency_flow,
@@ -232,6 +237,27 @@ class Pump:
             label="Efficiency (%)",
         )
         self.ax2.set_ylabel("Efficiency (%)")
+        return self
+
+    def plot_speeds(self, default_speeds=True):
+        """plots various speed curves. In future this will accept a list of speeds, or
+        will accept speeds previously passed to generate_speeds. For now this only accepts
+        default speeds (90, 80, 70, 60, 50)%.
+
+        Args:
+            default_speeds (bool, optional): Not currently implemented. Defaults to True.
+
+        Returns:
+            matplotlib ax: ax object with new speed curves added
+        """
+        if default_speeds:
+            speed_dict = self.generate_speed_curves()
+        else:
+            raise NotImplementedError ("Currently only accepts default speed curves.")
+        for key, value in speed_dict.items():
+            self.ax1.plot(
+                value[0], value[1], label=str(key) + "%", alpha=0.2, color="tab:blue"
+            )
         return self
 
     def get_legends(self):
@@ -245,6 +271,5 @@ class Pump:
         return self.fig.legend(lines, labels, loc="upper right")
 
     def show_plot(self):
-
         self.get_legends()
         plt.show()
