@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 # TODO - Add system curve plotting option
 # TODO - add BEP and POR with optional fill for various speeds
 # TODO - add capability to pot custom speeds
+# TODO - add save argument to show plot method
 
 
 class Pump:
