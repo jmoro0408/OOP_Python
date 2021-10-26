@@ -268,10 +268,17 @@ class Pump:
         """
         lines_labels = [ax.get_legend_handles_labels() for ax in self.fig.axes]
         lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-        return self.fig.legend(lines, labels, bbox_to_anchor=(1.15, 0.94))
+        return self.fig.legend(
+            lines,
+            labels,
+            bbox_to_anchor=(1, 0),
+            loc="lower right",
+            bbox_transform=self.fig.transFigure,
+        )
 
-    def show_plot(self):
-        plt.tight_layout()
+    def show_plot(self, grid=True):
+        self.fig.tight_layout()
         self.get_legends()
-
+        if grid:
+            self.ax1.grid(linestyle="dotted", alpha=0.35, color="grey")
         plt.show()
