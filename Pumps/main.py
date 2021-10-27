@@ -24,3 +24,5 @@ if __name__ == "__main__":
         .add_efficiency()
         .show_plot(save=False, grid=True)
     )
+
+    pump1.BEP_at_speed(speed=70, print_string=True)

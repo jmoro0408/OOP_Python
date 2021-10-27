@@ -6,7 +6,6 @@ from datetime import datetime
 # TODO - fix legend
 # TODO - add duty point plotting option
 # TODO - Add system curve plotting option
-# TODO - add BEP and POR with optional fill for various speeds
 # TODO - Add capability to provide custom AOR and POR points
 # TODO - change POR Plotting to allow marker, line, or fill
 
@@ -192,7 +191,9 @@ class Pump:
         Returns:
             dict: dictionary holding all the speed BEP data with structure: {speed: (BEP flow, BEP head)}
         """
-        if (isinstance(speeds, int)) or (isinstance(speeds, float)):  # allows single speed plotting
+        if (isinstance(speeds, int)) or (
+            isinstance(speeds, float)
+        ):  # allows single speed plotting
             speeds = [speeds]
         BEP_speeds_dict = {}
         _, BEP_flow, BEP_head = self.BEP()
@@ -216,7 +217,9 @@ class Pump:
             {Speed: (POR Flow - Upper, POR head - Upper, POR Flow - Lower, POR head - Lower)}
         """
 
-        if (isinstance(speeds, int)) or (isinstance(speeds, float)):  # allows single speed plotting
+        if (isinstance(speeds, int)) or (
+            isinstance(speeds, float)
+        ):  # allows single speed plotting
             speeds = [speeds]
         POR_speeds_dict = {}
         (
@@ -254,6 +257,17 @@ class Pump:
         flow_multiplier = speed / 100
         head_multiplier = (speed / 100) ** 2
         return flow_multiplier, head_multiplier
+
+    def BEP_at_speed(self, speed, print_string=False):
+        best_efficiency, BEP_flow_100, BEP_head_100 = self.BEP()
+        flow_multiplier, head_multiplier = self.affinity_ratio(speed)
+        BEP_flow_speed = BEP_flow_100 * flow_multiplier
+        BEP_head_speed = BEP_head_100 * head_multiplier
+        if print_string:
+            print(
+                f"""The best efficiency at {speed}% speed is {round(best_efficiency,2)} %, occuring at {round(BEP_flow_speed,2)} L/s and {round(BEP_head_speed,2)} m"""
+            )
+        return best_efficiency, BEP_flow_speed, BEP_head_speed
 
     #####-----------Plotting Functions------------######
 
