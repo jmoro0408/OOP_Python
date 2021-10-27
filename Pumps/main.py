@@ -22,5 +22,5 @@ if __name__ == "__main__":
         .add_npshr()
         .plot_speeds()
         .add_efficiency()
-        .show_plot()
+        .show_plot(save=False)
     )

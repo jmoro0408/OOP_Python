@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
+from datetime import datetime
 
 # TODO - fix legend
 # TODO - add duty point plotting option
@@ -283,9 +285,19 @@ class Pump:
             bbox_transform=self.fig.transFigure,
         )
 
-    def show_plot(self, grid=True):
+    def show_plot(self, grid=True, save=False, save_dir: str = None):
         self.fig.tight_layout()
         self.get_legends()
         if grid:
             self.ax1.grid(linestyle="dotted", alpha=0.35, color="grey")
         plt.show()
+
+        now = datetime.now()
+        now = now.strftime("%d_%m_%Y__%H_%M_%S")
+        filename = Path(f"Output Plot_{now}.png")  # saving with date and time appended
+
+        if save:
+            if save_dir is None:
+                save_dir = Path.cwd()
+            self.fig.savefig(fname=Path(save_dir / filename), format="png")
+            print(f"Image saved as {filename} at {save_dir}")
