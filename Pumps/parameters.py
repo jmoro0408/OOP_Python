@@ -129,7 +129,7 @@ class Pump:
             dict: dictionary of speeds and corresponding head and flow.
             dict has structure {speed: ([flow], [head])}
         """
-        if isinstance(speeds, int):
+        if (isinstance(speeds, int)) or (isinstance(speeds, float)):
             speeds = [speeds]
         _speeds = self.default_speeds  # typical % speeds
         if speeds is not None:
@@ -182,8 +182,17 @@ class Pump:
         poly = np.poly1d(coeff)
         return poly
 
-    def generate_speeds_BEP(self, speeds=list):
-        if isinstance(speeds, int):  # allows single speed plotting
+    def generate_speeds_BEP(self, speeds: list):
+        """generates BEPs for various speeds. Argument should be a list of speeds, if a single speed is preferred, this
+        can be passed as an int which is automatically mapped to a single element list.
+
+        Args:
+            speeds (list) : list of speeds to create BEPs for.
+
+        Returns:
+            dict: dictionary holding all the speed BEP data with structure: {speed: (BEP flow, BEP head)}
+        """
+        if (isinstance(speeds, int)) or (isinstance(speeds, float)):  # allows single speed plotting
             speeds = [speeds]
         BEP_speeds_dict = {}
         _, BEP_flow, BEP_head = self.BEP()
@@ -195,8 +204,19 @@ class Pump:
             BEP_speeds_dict.update(_temp_dict)
         return BEP_speeds_dict
 
-    def generate_speeds_POR(self, speeds=list):
-        if isinstance(speeds, int):  # allows single speed plotting
+    def generate_speeds_POR(self, speeds: list):
+        """generate PORs for various speeds. If a single speed is preferred this can be passed as an int which is automatically
+        mapped to a single element list.
+
+        Args:
+            speeds (list): list of speeds for POR points to be created for.
+
+        Returns:
+            dict: dictionary of speeds with corresponding POR data points. Structure:
+            {Speed: (POR Flow - Upper, POR head - Upper, POR Flow - Lower, POR head - Lower)}
+        """
+
+        if (isinstance(speeds, int)) or (isinstance(speeds, float)):  # allows single speed plotting
             speeds = [speeds]
         POR_speeds_dict = {}
         (
@@ -313,6 +333,9 @@ class Pump:
         Args:
             speeds (bool, optional): If None, typical speeds are plotted. Custom speeds
             should be passed as a list.
+
+            BEP (Bool, optional): If True, BEP points are plotted for the given speeds. Defaults to False.
+            POR (Bool, optional): If True, POR points are plotted for the given speeds. Defaults to False.
 
         Returns:
             matplotlib ax: ax object with new speed curves added
