@@ -7,7 +7,8 @@ from datetime import datetime
 # TODO - add duty point plotting option
 # TODO - Add system curve plotting option
 # TODO - Add capability to provide custom AOR and POR points
-# TODO - change POR Plotting to allow marker, line, or fill
+# TODO - Add POR Plotting to allow fill
+# TODO - connect POR lines to 100% speed marker
 
 
 class Pump:
@@ -265,7 +266,7 @@ class Pump:
         BEP_head_speed = BEP_head_100 * head_multiplier
         if print_string:
             print(
-                f"""The best efficiency at {speed}% speed is {round(best_efficiency,2)} %, occuring at {round(BEP_flow_speed,2)} L/s and {round(BEP_head_speed,2)} m"""
+                f"""The best efficiency at {speed}% speed is {round(best_efficiency,2)}, occuring at {round(BEP_flow_speed,2)} L/s and {round(BEP_head_speed,2)} m"""
             )
         return best_efficiency, BEP_flow_speed, BEP_head_speed
 
@@ -354,6 +355,12 @@ class Pump:
         Returns:
             matplotlib ax: ax object with new speed curves added
         """
+        plot_params_dict = {
+            "_marker": "x" if (POR == "marker") or (POR == True) else "None",
+            "_linestyle": "dashed" if POR == "line" else "None",
+            "_fill": True if POR == "fill" else False,
+        }
+
         if speeds is None:
             speed_dict = self.generate_speed_curves()
         else:
@@ -374,9 +381,30 @@ class Pump:
                 POR_dict = self.generate_speeds_POR(speeds=self.default_speeds)
             else:
                 POR_dict = self.generate_speeds_POR(speeds=speeds)
+
+            upper_flows = []
+            upper_heads = []
+            lower_flows = []
+            lower_heads = []
             for key, value in POR_dict.items():
-                self.ax1.plot(value[0], value[1], marker="x", color="red")
-                self.ax1.plot(value[2], value[3], marker="x", color="red")
+                upper_flows.append(value[0])
+                upper_heads.append(value[1])
+                lower_flows.append(value[2])
+                lower_heads.append(value[3])
+            self.ax1.plot(
+                upper_flows,
+                upper_heads,
+                marker=plot_params_dict["_marker"],
+                linestyle=plot_params_dict["_linestyle"],
+                color="red",
+            )
+            self.ax1.plot(
+                lower_flows,
+                lower_heads,
+                marker=plot_params_dict["_marker"],
+                linestyle=plot_params_dict["_linestyle"],
+                color="red",
+            )
         return self
 
     def get_legends(self):

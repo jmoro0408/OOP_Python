@@ -20,9 +20,9 @@ if __name__ == "__main__":
     (
         pump1.generate_plot(BEP=True, POR=True)
         .add_npshr()
-        .plot_speeds(BEP=True, POR=True)
+        .plot_speeds(BEP=True, POR="line")
         .add_efficiency()
         .show_plot(save=False, grid=True)
     )
 
-    pump1.BEP_at_speed(speed=70, print_string=True)
+    # pump1.BEP_at_speed(speed=70, print_string=True)
