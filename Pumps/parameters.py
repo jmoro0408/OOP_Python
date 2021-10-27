@@ -125,6 +125,8 @@ class Pump:
             dict: dictionary of speeds and corresponding head and flow.
             dict has structure {speed: ([flow], [head])}
         """
+        if isinstance(speeds, int):
+            speeds = [speeds]
         _speeds = [90, 80, 70, 60, 50]  # typical % speeds
         if speeds is not None:
             _speeds = speeds
@@ -135,7 +137,7 @@ class Pump:
             speed_curve_dict.update(_temp_dict)
         return speed_curve_dict
 
-    def POR(self, speed=100):
+    def POR(self):
         """creates upper and lower preferred operating points for a given pump speed.
         This assume HI guidance (lower = 70% BEP flow, upper = 120% BEP flow)
 
@@ -177,6 +179,8 @@ class Pump:
         return poly
 
     def generate_speeds_BEP(self, speeds=list):
+        if isinstance(speeds, int): #allows single speed plotting
+            speeds = [speeds]
         BEP_speeds_dict = {}
         _, BEP_flow, BEP_head = self.BEP()
         for speed in speeds:
@@ -188,8 +192,14 @@ class Pump:
             BEP_speeds_dict.update(_temp_dict)
         return BEP_speeds_dict
 
-    def generate_speeds_POR(self, speed=int):
-        pass
+    def generate_speeds_POR(self, speeds=list):
+        POR_speeds_dict = {}
+        (
+            POR_upper_flow,
+            POR_upper_head,
+            POR_lower_flow,
+            POR_lower_head,
+        ) = self.generate_speeds_POR()
 
     #####-----------Plotting Functions------------######
 
