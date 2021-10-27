@@ -8,10 +8,12 @@ from datetime import datetime
 # TODO - Add system curve plotting option
 # TODO - add BEP and POR with optional fill for various speeds
 # TODO - Add capability to provide custom AOR and POR points
+# TODO - change POR Plotting to allow marker, line, or fill
 
 
 class Pump:
 
+    default_speeds = [90, 80, 70, 60, 50]
     flow = None
     head = None
 
@@ -106,9 +108,11 @@ class Pump:
         Returns:
             (tuple): Tuple of two lists, containing reduced flow and reduced head values
         """
-        ratio = new_speed / 100  # assumes original pump curve is at 100% speed
-        reduced_flow = [flow * ratio for flow in self.flow]
-        reduced_head = [head * ratio ** 2 for head in self.head]
+        flow_multplier, head_multipler = self.affinity_ratio(
+            new_speed
+        )  # assumes original pump curve is at 100% speed
+        reduced_flow = [flow * flow_multplier for flow in self.flow]
+        reduced_head = [head * head_multipler for head in self.head]
 
         return reduced_flow, reduced_head
 
@@ -127,7 +131,7 @@ class Pump:
         """
         if isinstance(speeds, int):
             speeds = [speeds]
-        _speeds = [90, 80, 70, 60, 50]  # typical % speeds
+        _speeds = self.default_speeds  # typical % speeds
         if speeds is not None:
             _speeds = speeds
         speed_curve_dict = {}  # empty dict to hold our speed data.
@@ -179,13 +183,12 @@ class Pump:
         return poly
 
     def generate_speeds_BEP(self, speeds=list):
-        if isinstance(speeds, int): #allows single speed plotting
+        if isinstance(speeds, int):  # allows single speed plotting
             speeds = [speeds]
         BEP_speeds_dict = {}
         _, BEP_flow, BEP_head = self.BEP()
         for speed in speeds:
-            flow_multiplier = speed / 100
-            head_multiplier = (speed / 100) ** 2
+            flow_multiplier, head_multiplier = self.affinity_ratio(speed)
             BEP_flow_speed = BEP_flow * flow_multiplier
             BEP_head_speed = BEP_head * head_multiplier
             _temp_dict = {speed: (BEP_flow_speed, BEP_head_speed)}
@@ -193,13 +196,44 @@ class Pump:
         return BEP_speeds_dict
 
     def generate_speeds_POR(self, speeds=list):
+        if isinstance(speeds, int):  # allows single speed plotting
+            speeds = [speeds]
         POR_speeds_dict = {}
         (
             POR_upper_flow,
             POR_upper_head,
             POR_lower_flow,
             POR_lower_head,
-        ) = self.generate_speeds_POR()
+        ) = self.POR()
+        for speed in speeds:
+            flow_multiplier, head_multiplier = self.affinity_ratio(speed)
+            POR_flow_speed_upper = POR_upper_flow * flow_multiplier
+            POR_head_speed_upper = POR_upper_head * head_multiplier
+            POR_flow_speed_lower = POR_lower_flow * flow_multiplier
+            POR_head_speed_lower = POR_lower_head * head_multiplier
+            _temp_dict = {
+                speed: (
+                    POR_flow_speed_upper,
+                    POR_head_speed_upper,
+                    POR_flow_speed_lower,
+                    POR_head_speed_lower,
+                )
+            }
+            POR_speeds_dict.update(_temp_dict)
+        return POR_speeds_dict
+
+    def affinity_ratio(self, speed: int):
+        """Uses affinity laws to create flow and head multipliers for a given speed.
+
+        Args:
+            speed (int): new speed the ratio is to be calculated for
+
+        Returns:
+            flow_multiplier, head_multiplier (int, int): multipliers for flow and head
+        """
+        flow_multiplier = speed / 100
+        head_multiplier = (speed / 100) ** 2
+        return flow_multiplier, head_multiplier
 
     #####-----------Plotting Functions------------######
 
@@ -272,7 +306,7 @@ class Pump:
         self.ax2.set_ylabel("Efficiency (%)")
         return self
 
-    def plot_speeds(self, speeds=None, BEP=False):
+    def plot_speeds(self, speeds=None, BEP=False, POR=False):
         """plots various speed curves.
         If no speeds are passed the method plots "typical" speeds (90,80,70,60,50)%.
 
@@ -293,11 +327,19 @@ class Pump:
             )
         if BEP:
             if speeds is None:
-                BEP_dict = self.generate_speeds_BEP(speeds=[90, 80, 70, 60, 50])
+                BEP_dict = self.generate_speeds_BEP(speeds=self.default_speeds)
             else:
                 BEP_dict = self.generate_speeds_BEP(speeds)
             for key, value in BEP_dict.items():
                 self.ax1.plot(value[0], value[1], marker="o", color="orange")
+        if POR:
+            if speeds is None:
+                POR_dict = self.generate_speeds_POR(speeds=self.default_speeds)
+            else:
+                POR_dict = self.generate_speeds_POR(speeds=speeds)
+            for key, value in POR_dict.items():
+                self.ax1.plot(value[0], value[1], marker="x", color="red")
+                self.ax1.plot(value[2], value[3], marker="x", color="red")
         return self
 
     def get_legends(self):
