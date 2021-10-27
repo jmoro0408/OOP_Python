@@ -16,11 +16,11 @@ if __name__ == "__main__":
     pump1.define_pumpcurve(flow=pump_curve["Flow [l/s]"], head=pump_curve["Head [m]"])
     pump1.define_efficiency(efficiency=pump_curve["Overall Efficiency [%]"])
     pump1.define_npshr(npshr=pump_curve["NPSHR-values [m]"])
-
+    plot_speeds = [95, 85, 72]
     (
         pump1.generate_plot(BEP=True, POR=True)
         .add_npshr()
-        .plot_speeds()
+        .plot_speeds(speeds=plot_speeds, BEP=True)
         .add_efficiency()
         .show_plot(save=False)
     )

@@ -7,8 +7,7 @@ from datetime import datetime
 # TODO - add duty point plotting option
 # TODO - Add system curve plotting option
 # TODO - add BEP and POR with optional fill for various speeds
-# TODO - add capability to pot custom speeds
-# TODO - add save argument to show plot method
+# TODO - Add capability to provide custom AOR and POR points
 
 
 class Pump:
@@ -73,7 +72,7 @@ class Pump:
         if npshr_flow is not None:
             self.npshr_flow = npshr_flow
 
-    def BEP(self, speed=100):
+    def BEP(self):
         """return the best efficiency point for a given pump.
         will return the best efficiency (%), followed by the corresponding flow and head
 
@@ -177,6 +176,21 @@ class Pump:
         poly = np.poly1d(coeff)
         return poly
 
+    def generate_speeds_BEP(self, speeds=list):
+        BEP_speeds_dict = {}
+        _, BEP_flow, BEP_head = self.BEP()
+        for speed in speeds:
+            flow_multiplier = speed / 100
+            head_multiplier = (speed / 100) ** 2
+            BEP_flow_speed = BEP_flow * flow_multiplier
+            BEP_head_speed = BEP_head * head_multiplier
+            _temp_dict = {speed: (BEP_flow_speed, BEP_head_speed)}
+            BEP_speeds_dict.update(_temp_dict)
+        return BEP_speeds_dict
+
+    def generate_speeds_POR(self, speed=int):
+        pass
+
     #####-----------Plotting Functions------------######
 
     def generate_plot(self, BEP=False, POR=False):
@@ -248,25 +262,32 @@ class Pump:
         self.ax2.set_ylabel("Efficiency (%)")
         return self
 
-    def plot_speeds(self, default_speeds=True):
-        """plots various speed curves. In future this will accept a list of speeds, or
-        will accept speeds previously passed to generate_speeds. For now this only accepts
-        default speeds (90, 80, 70, 60, 50)%.
+    def plot_speeds(self, speeds=None, BEP=False):
+        """plots various speed curves.
+        If no speeds are passed the method plots "typical" speeds (90,80,70,60,50)%.
 
         Args:
-            default_speeds (bool, optional): Not currently implemented. Defaults to True.
+            speeds (bool, optional): If None, typical speeds are plotted. Custom speeds
+            should be passed as a list.
 
         Returns:
             matplotlib ax: ax object with new speed curves added
         """
-        if default_speeds:
+        if speeds is None:
             speed_dict = self.generate_speed_curves()
         else:
-            raise NotImplementedError("Currently only accepts default speed curves.")
+            speed_dict = self.generate_speed_curves(speeds)
         for key, value in speed_dict.items():
             self.ax1.plot(
                 value[0], value[1], label=str(key) + "%", alpha=0.2, color="tab:blue"
             )
+        if BEP:
+            if speeds is None:
+                BEP_dict = self.generate_speeds_BEP(speeds=[90, 80, 70, 60, 50])
+            else:
+                BEP_dict = self.generate_speeds_BEP(speeds)
+            for key, value in BEP_dict.items():
+                self.ax1.plot(value[0], value[1], marker="o", color="orange")
         return self
 
     def get_legends(self):
