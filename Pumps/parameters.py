@@ -270,23 +270,6 @@ class Pump:
             )
         return best_efficiency, BEP_flow_speed, BEP_head_speed
 
-    @staticmethod
-    def flatten(t):
-        """flattens a list of lists into a one dimensional list
-
-        Args:
-            t (list): list of lists to be flattend
-
-        Returns:
-            list: one dimensional list containing all inner lists
-        """
-        flatten = [float(item) for sublist in t for item in sublist]
-        return flatten
-
-    @staticmethod
-    def to_numpy_array(list):
-        pass
-
     #####-----------Plotting Functions------------######
 
     def generate_plot(self, BEP=False, POR=False):
