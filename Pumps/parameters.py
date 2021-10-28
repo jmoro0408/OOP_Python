@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Union
 
 # TODO - fix legend
-# TODO - add duty point plotting option
 # TODO - Add system curve plotting option
 # TODO - Add capability to provide custom AOR and POR points
 # TODO - POR plotting feels hacky. Should rewrite to improve readability, named tuples would head instead of so much slicing
@@ -320,7 +319,11 @@ class Pump:
             )
         else:
             self.ax1.plot(
-                self.npshr_flow, self.npshr, linestyle="-.", color="g", label="NPSHr"
+                self.npshr_flow,
+                self.npshr,
+                linestyle="-.",
+                color="coral",
+                label="NPSHr",
             )
             return self
 
@@ -420,6 +423,7 @@ class Pump:
                     alpha=0.2,
                     linewidth=0,
                 )
+                return self
 
             self.ax1.plot(
                 upper_flows,
@@ -437,26 +441,35 @@ class Pump:
             )
         return self
 
-    def plot_POR_filled(self):
-        upper_flows = [self.POR()[0]]
-        upper_heads = [self.POR()[1]]
-        lower_flows = [self.POR()[2]]
-        lower_heads = [self.POR()[3]]
-        self.ax1.fill(np.append())
+    def add_duty(self, duty_flow, duty_head, line=False):
+        """add a marker or line for a given duty point.
 
-        # Filling gap between POR curve and 100% speed curve
-        POR_flows = np.linspace(
-            self.POR()[0], self.POR()[2], 20
-        )  # Getting the ranges of the POR flow and creating a linear array
-        POR_heads = np.linspace(
-            self.POR()[1], self.POR()[3], 20
-        )  # Getting the ranges of the POR head and creating a linear array
-        pump_curve_coeffs = self.generate_curve_equation(self.flow, self.head)
-        pump_flows = pump_curve_coeffs(POR_flows)
-        self.ax1.fill_between(
-            x=POR_flows, y1=POR_heads, y2=pump_flows, color="red", alpha=0.2
+        Args:
+            duty_flow (float or int): flow at duty point
+            duty_head (float or int): head at duty point
+            line (bool): if True, plots a line at the duty flow instead of a marker. Defaults to False.
+
+        Returns:
+            matplotlib axes object: plot with duty point added
+        """
+        if line:
+            self.ax1.vlines(
+                duty_flow,
+                ymax=max(self.head),
+                ymin=0,
+                linestyles="dotted",
+                colors="forestgreen",
+                label="Duty",
+            )
+            return self
+        self.ax1.plot(
+            duty_flow,
+            duty_head,
+            marker="+",
+            color="forestgreen",
+            label="Duty Point",
+            linestyle="None",
         )
-
         return self
 
     def get_legends(self):

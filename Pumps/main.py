@@ -22,6 +22,7 @@ if __name__ == "__main__":
         .add_npshr()
         .plot_speeds(BEP=True, POR=True)
         .add_efficiency()
+        .add_duty(duty_flow=300, duty_head=10, line=True)
         .show_plot(save=False, grid=True)
     )
 
