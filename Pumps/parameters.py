@@ -8,8 +8,7 @@ from typing import Union
 # TODO - add duty point plotting option
 # TODO - Add system curve plotting option
 # TODO - Add capability to provide custom AOR and POR points
-# TODO - Add POR Plotting to allow fill
-# TODO - connect POR lines to 100% speed marker
+# TODO - POR plotting feels hacky. Should rewrite to improve readability, named tuples would head instead of so much slicing
 
 
 class Pump:
@@ -271,6 +270,23 @@ class Pump:
             )
         return best_efficiency, BEP_flow_speed, BEP_head_speed
 
+    @staticmethod
+    def flatten(t):
+        """flattens a list of lists into a one dimensional list
+
+        Args:
+            t (list): list of lists to be flattend
+
+        Returns:
+            list: one dimensional list containing all inner lists
+        """
+        flatten = [float(item) for sublist in t for item in sublist]
+        return flatten
+
+    @staticmethod
+    def to_numpy_array(list):
+        pass
+
     #####-----------Plotting Functions------------######
 
     def generate_plot(self, BEP=False, POR=False):
@@ -342,7 +358,7 @@ class Pump:
         self.ax2.set_ylabel("Efficiency (%)")
         return self
 
-    def plot_speeds(self, speeds=None, BEP=False, POR: Union(bool, str) = False):
+    def plot_speeds(self, speeds=None, BEP=False, POR=False):
         """plots various speed curves.
         If no speeds are passed the method plots "typical" speeds (90,80,70,60,50)%.
 
@@ -386,17 +402,42 @@ class Pump:
             else:
                 POR_dict = self.generate_speeds_POR(speeds=speeds)
 
-            upper_flows = [
-                self.POR()[0]
-            ]  # grabbing the 100% POR points. Reqd to make the line meet the 100% speed curve
+            # grabbing the 100% POR points. Reqd to make the line meet the 100% speed curve
+            upper_flows = [self.POR()[0]]
             upper_heads = [self.POR()[1]]
             lower_flows = [self.POR()[2]]
             lower_heads = [self.POR()[3]]
+            # grabbing POR points for other speeds
             for key, value in POR_dict.items():
                 upper_flows.append(value[0])
                 upper_heads.append(value[1])
                 lower_flows.append(value[2])
                 lower_heads.append(value[3])
+
+            if POR == "fill":
+                self.ax1.fill(
+                    np.append(upper_flows, lower_flows[::-1]),
+                    np.append(upper_heads, lower_heads[::-1]),
+                    color="red",
+                    alpha=0.2,
+                    linewidth=0,
+                )
+                # Filling gap between POR curve and 100% speed curve
+                # Getting the ranges of the POR flow and creating a linear array
+                POR_flows = np.linspace(self.POR()[0], self.POR()[2], 20)
+                # Getting the ranges of the POR head and creating a linear array
+                POR_heads = np.linspace(self.POR()[1], self.POR()[3], 20)
+                pump_curve_coeffs = self.generate_curve_equation(self.flow, self.head)
+                pump_flows = pump_curve_coeffs(POR_flows)
+                self.ax1.fill_between(
+                    x=POR_flows,
+                    y1=POR_heads,
+                    y2=pump_flows,
+                    color="red",
+                    alpha=0.2,
+                    linewidth=0,
+                )
+
             self.ax1.plot(
                 upper_flows,
                 upper_heads,
@@ -411,6 +452,28 @@ class Pump:
                 linestyle=plot_params_dict["_linestyle"],
                 color="red",
             )
+        return self
+
+    def plot_POR_filled(self):
+        upper_flows = [self.POR()[0]]
+        upper_heads = [self.POR()[1]]
+        lower_flows = [self.POR()[2]]
+        lower_heads = [self.POR()[3]]
+        self.ax1.fill(np.append())
+
+        # Filling gap between POR curve and 100% speed curve
+        POR_flows = np.linspace(
+            self.POR()[0], self.POR()[2], 20
+        )  # Getting the ranges of the POR flow and creating a linear array
+        POR_heads = np.linspace(
+            self.POR()[1], self.POR()[3], 20
+        )  # Getting the ranges of the POR head and creating a linear array
+        pump_curve_coeffs = self.generate_curve_equation(self.flow, self.head)
+        pump_flows = pump_curve_coeffs(POR_flows)
+        self.ax1.fill_between(
+            x=POR_flows, y1=POR_heads, y2=pump_flows, color="red", alpha=0.2
+        )
+
         return self
 
     def get_legends(self):
