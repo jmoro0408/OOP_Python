@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 from datetime import datetime
+from typing import Union
 
 # TODO - fix legend
 # TODO - add duty point plotting option
@@ -341,7 +342,7 @@ class Pump:
         self.ax2.set_ylabel("Efficiency (%)")
         return self
 
-    def plot_speeds(self, speeds=None, BEP=False, POR=False):
+    def plot_speeds(self, speeds=None, BEP=False, POR: Union(bool, str) = False):
         """plots various speed curves.
         If no speeds are passed the method plots "typical" speeds (90,80,70,60,50)%.
 
@@ -350,7 +351,10 @@ class Pump:
             should be passed as a list.
 
             BEP (Bool, optional): If True, BEP points are plotted for the given speeds. Defaults to False.
-            POR (Bool, optional): If True, POR points are plotted for the given speeds. Defaults to False.
+            POR (Bool|Str, optional): Plotting method for POR. Accepts True, False, "marker", "line", or "fill".
+                                        If True - Markers are plotted.
+                                        If False - No POR is plotted.
+                                        Defaults to False.
 
         Returns:
             matplotlib ax: ax object with new speed curves added
@@ -382,10 +386,12 @@ class Pump:
             else:
                 POR_dict = self.generate_speeds_POR(speeds=speeds)
 
-            upper_flows = []
-            upper_heads = []
-            lower_flows = []
-            lower_heads = []
+            upper_flows = [
+                self.POR()[0]
+            ]  # grabbing the 100% POR points. Reqd to make the line meet the 100% speed curve
+            upper_heads = [self.POR()[1]]
+            lower_flows = [self.POR()[2]]
+            lower_heads = [self.POR()[3]]
             for key, value in POR_dict.items():
                 upper_flows.append(value[0])
                 upper_heads.append(value[1])
