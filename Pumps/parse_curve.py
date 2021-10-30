@@ -1,3 +1,4 @@
+from re import L
 import pandas as pd
 from pathlib import Path
 import json
@@ -40,6 +41,49 @@ def parse_xylect_curve(pump_curve_filepath: str):
     del _pump_curve, _pump_info_dict, _pump_curve_dict  # deleting unused data
 
     return pump_dict
+
+
+def parse_excel_curve(
+    filepath: str,
+    flow: str,
+    head: str,
+    npshr: str = None,
+    npshr_flow: str = None,
+    efficiency: str = None,
+    efficiency_flow: str = None,
+):
+    """parses general excel data file into xylect-like structure.
+    The exact column names for flow, head, efficiency etc must be provided as arguments
+
+    Args:
+        filepath (str): Filepath location
+        flow (str): exact name of the column containing flow data
+        head (str): exact name of the column containing head data
+        npshr (str, optional): exact name of the column containing npshr data. Defaults to None.
+        npshr_flow (str, optional): exact name of the column containing npshr flow data. If npshr_flow = None and npshr is not none, flow is assumed to match the pump curve flow. Defaults to None. Defaults to None.
+        efficiency (str, optional): exact name of the column containing efficiency data. Defaults to None.. Defaults to None.
+        efficiency_flow (str, optional): exact name of the column containing npshr flow data. If efficiency_flow = None and efficiency is not none, flow is assumed to match the pump curve flow. Defaults to None. Defaults to None.
+
+    Returns:
+        dict: dictionary holding pump data
+    """
+    heading_names = {
+        flow: "Flow [l/s]",
+        head: "Head [m]",
+        npshr: "NPSHR-values [m]",
+        npshr_flow: "NPSHR-Flow [l/s]",
+        efficiency: "Overall Efficiency [%]",
+        efficiency_flow: "Overall Efficiency Flow [l/s",
+    }
+    _pump_curve = pd.read_excel(filepath)
+    _pump_curve.dropna(axis=0, how="all", inplace=True)
+    _pump_curve = _pump_curve.rename(columns=_pump_curve.iloc[0]).drop(
+        _pump_curve.index[0]
+    )  # swapping the header names with the first row
+    _pump_curve.rename(heading_names, axis=1, inplace=True)
+    _pump_curve_dict = _pump_curve.to_dict(orient="list")
+
+    return _pump_curve_dict
 
 
 def write_json(pump_dict: dict):

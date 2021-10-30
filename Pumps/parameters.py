@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 from datetime import datetime
-from typing import Union
 
 # TODO - fix legend
 # TODO - Add system curve plotting option
 # TODO - Add capability to provide custom AOR and POR points
+# TODO - Add auto duty point based on system and pump curves
 # TODO - POR plotting feels hacky. Should rewrite to improve readability, named tuples would head instead of so much slicing
 
 
@@ -410,9 +410,9 @@ class Pump:
                 )
                 # Filling gap between POR curve and 100% speed curve
                 # Getting the ranges of the POR flow and creating a linear array
-                POR_flows = np.linspace(self.POR()[0], self.POR()[2], 20)
+                POR_flows = np.linspace(self.POR()[0], self.POR()[2], 50)
                 # Getting the ranges of the POR head and creating a linear array
-                POR_heads = np.linspace(self.POR()[1], self.POR()[3], 20)
+                POR_heads = np.linspace(self.POR()[1], self.POR()[3], 50)
                 pump_curve_coeffs = self.generate_curve_equation(self.flow, self.head)
                 pump_flows = pump_curve_coeffs(POR_flows)
                 self.ax1.fill_between(
