@@ -21,13 +21,13 @@ def xylect_test():
     (
         pump1.generate_plot(BEP=True, POR=True)
         .add_npshr()
-        .plot_speeds(BEP=True, POR="fill")
+        .plot_speeds(BEP=True, POR="marker")
         .add_efficiency()
         .add_duty(duty_flow=300, duty_head=10, line=True)
         .show_plot(save=False, grid=True)
     )
 
-    pump1.BEP_at_speed(speed=70, print_string=True)
+    # pump1.BEP_at_speed(speed=70, print_string=True)
 
 
 def general_curve_test():

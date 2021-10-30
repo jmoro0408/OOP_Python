@@ -163,7 +163,13 @@ class Pump:
         )  # POR upper range is 120% of the BEP (Hydraulic Institute)
         POR_upper_head = poly(POR_upper_flow)
 
-        return POR_upper_flow, POR_upper_head, POR_lower_flow, POR_lower_head
+        POR_dict = {
+            "Upper Flow": POR_upper_flow,
+            "Upper Head": POR_upper_head,
+            "Lower Flow": POR_lower_flow,
+            "Lower Head": POR_lower_head,
+        }
+        return POR_dict
 
     @staticmethod
     def generate_curve_equation(x: list, y: list, deg=3):
@@ -222,18 +228,13 @@ class Pump:
         ):  # allows single speed plotting
             speeds = [speeds]
         POR_speeds_dict = {}
-        (
-            POR_upper_flow,
-            POR_upper_head,
-            POR_lower_flow,
-            POR_lower_head,
-        ) = self.POR()
+        POR_dict = self.POR()
         for speed in speeds:
             flow_multiplier, head_multiplier = self.affinity_ratio(speed)
-            POR_flow_speed_upper = POR_upper_flow * flow_multiplier
-            POR_head_speed_upper = POR_upper_head * head_multiplier
-            POR_flow_speed_lower = POR_lower_flow * flow_multiplier
-            POR_head_speed_lower = POR_lower_head * head_multiplier
+            POR_flow_speed_upper = POR_dict["Upper Flow"] * flow_multiplier
+            POR_head_speed_upper = POR_dict["Upper Head"] * head_multiplier
+            POR_flow_speed_lower = POR_dict["Lower Flow"] * flow_multiplier
+            POR_head_speed_lower = POR_dict["Lower Head"] * head_multiplier
             _temp_dict = {
                 speed: (
                     POR_flow_speed_upper,
@@ -291,11 +292,17 @@ class Pump:
             _, BEP_flow, BEP_head = self.BEP()
             self.ax1.plot(BEP_flow, BEP_head, marker="o", label="BEP")
         if POR:
-            POR_upper_flow, POR_upper_head, POR_lower_flow, POR_lower_head = self.POR()
+            POR_dict = self.POR()
             self.ax1.plot(
-                POR_upper_flow, POR_upper_head, marker="x", color="r", label="POR"
+                POR_dict["Upper Flow"],
+                POR_dict["Upper Head"],
+                marker="x",
+                color="r",
+                label="POR",
             )
-            self.ax1.plot(POR_lower_flow, POR_lower_head, marker="x", color="r")
+            self.ax1.plot(
+                POR_dict["Lower Flow"], POR_dict["Lower Head"], marker="x", color="r"
+            )
         return self
 
     def add_npshr(self):
@@ -389,10 +396,10 @@ class Pump:
                 POR_dict = self.generate_speeds_POR(speeds=speeds)
 
             # grabbing the 100% POR points. Reqd to make the line meet the 100% speed curve
-            upper_flows = [self.POR()[0]]
-            upper_heads = [self.POR()[1]]
-            lower_flows = [self.POR()[2]]
-            lower_heads = [self.POR()[3]]
+            upper_flows = [self.POR()["Upper Flow"]]
+            upper_heads = [self.POR()["Upper Head"]]
+            lower_flows = [self.POR()["Lower Flow"]]
+            lower_heads = [self.POR()["Lower Head"]]
             # grabbing POR points for other speeds
             for key, value in POR_dict.items():
                 upper_flows.append(value[0])
@@ -410,9 +417,9 @@ class Pump:
                 )
                 # Filling gap between POR curve and 100% speed curve
                 # Getting the ranges of the POR flow and creating a linear array
-                POR_flows = np.linspace(self.POR()[0], self.POR()[2], 50)
+                POR_flows = np.linspace(self.POR()["Upper Flow"], self.POR()["Lower Flow"], 50)
                 # Getting the ranges of the POR head and creating a linear array
-                POR_heads = np.linspace(self.POR()[1], self.POR()[3], 50)
+                POR_heads = np.linspace(self.POR()["Upper Head"], self.POR()["Lower Head"], 50)
                 pump_curve_coeffs = self.generate_curve_equation(self.flow, self.head)
                 pump_flows = pump_curve_coeffs(POR_flows)
                 self.ax1.fill_between(
