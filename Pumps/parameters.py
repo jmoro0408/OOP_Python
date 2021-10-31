@@ -417,9 +417,13 @@ class Pump:
                 )
                 # Filling gap between POR curve and 100% speed curve
                 # Getting the ranges of the POR flow and creating a linear array
-                POR_flows = np.linspace(self.POR()["Upper Flow"], self.POR()["Lower Flow"], 50)
+                POR_flows = np.linspace(
+                    self.POR()["Upper Flow"], self.POR()["Lower Flow"], 50
+                )
                 # Getting the ranges of the POR head and creating a linear array
-                POR_heads = np.linspace(self.POR()["Upper Head"], self.POR()["Lower Head"], 50)
+                POR_heads = np.linspace(
+                    self.POR()["Upper Head"], self.POR()["Lower Head"], 50
+                )
                 pump_curve_coeffs = self.generate_curve_equation(self.flow, self.head)
                 pump_flows = pump_curve_coeffs(POR_flows)
                 self.ax1.fill_between(
