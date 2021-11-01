@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 
 # TODO - fix legend
-# TODO - Add system curve plotting option
+# TODO - Combine system curve and pump curve plot. https://stackoverflow.com/questions/36204644/what-is-the-best-way-of-combining-two-independent-plots-with-matplotlib
 # TODO - Add capability to provide custom AOR and POR points
 # TODO - Add auto duty point based on system and pump curves
 
@@ -516,8 +516,18 @@ class Pump:
             print(f"Image saved as {filename} at {save_dir}")
 
 
-class SystemCurve:
+class SystemCurve(Pump):
     def __init__(self, name, flow, head):
         self.name = name
         self.flow = flow
         self.head = head
+
+    def plot(self, ax=None):
+
+        self.fig, self.ax1 = plt.subplots()
+        self.ax1.plot(self.flow, self.head, label="System Curve")
+        self.ax1.set_xlabel("Flow (L/s)")
+        self.ax1.set_ylabel("Head (m)")
+        self.ax1.set_title(f"System Curve for {self.name}")
+
+        return self

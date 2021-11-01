@@ -86,15 +86,17 @@ def parse_excel_curve(
     return _pump_curve_dict
 
 
-def parse_system_curve(filepath: str, flow: str, head: str):
+def parse_system_curve(filepath: str):
 
     _system_curve = pd.read_excel(filepath)
     _system_curve.dropna(axis=0, how="all", inplace=True)
+    _system_curve.dropna(axis=1, how="all", inplace=True)
+
     _system_curve = _system_curve.rename(columns=_system_curve.iloc[0]).drop(
         _system_curve.index[0]
     )  # swapping the header names with the first row
     _system_curve_dict = _system_curve.to_dict(orient="list")
-    print(_system_curve_dict.keys())
+    # print(_system_curve_dict.keys())
 
     return _system_curve_dict
 

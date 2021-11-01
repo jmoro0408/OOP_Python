@@ -1,11 +1,15 @@
-from parse_curve import parse_xylect_curve, parse_excel_curve
-from parameters import Pump
+from parse_curve import parse_xylect_curve, parse_excel_curve, parse_system_curve
+from parameters import Pump, SystemCurve
 
 PUMP_CURVE_FILEPATH = (
     r"/Users/jamesmoro/Documents/Python/OOP_Python/Pumps/pump_curves.xls"
 )
 GENERAL_CURVE_FILEPATH = (
     r"/Users/jamesmoro/Documents/Python/OOP_Python/Pumps/example_curves.xlsx"
+)
+
+SYSTEM_CURVE_FILEPATH = (
+    r"/Users/jamesmoro/Documents/Python/OOP_Python/Pumps/system_curve.xlsx"
 )
 
 
@@ -50,6 +54,17 @@ def general_curve_test():
     pump1.BEP_at_speed(speed=70, print_string=True)
 
 
+def system_curve_test():
+    _system_curve = parse_system_curve(SYSTEM_CURVE_FILEPATH)
+    system1 = SystemCurve(
+        name="Test System", flow=_system_curve["Flow"], head=_system_curve["Head"]
+    )
+    system1.plot().show_plot()
+
+
+import matplotlib.pyplot as plt
+
 if __name__ == "__main__":
     xylect_test()
     # general_curve_test()
+    # system_curve_test()
