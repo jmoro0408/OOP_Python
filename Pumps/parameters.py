@@ -7,7 +7,6 @@ from datetime import datetime
 # TODO - Add system curve plotting option
 # TODO - Add capability to provide custom AOR and POR points
 # TODO - Add auto duty point based on system and pump curves
-# TODO - POR plotting feels hacky. Should rewrite to improve readability, named tuples would head instead of so much slicing
 
 
 class Pump:
@@ -515,3 +514,10 @@ class Pump:
                 save_dir = Path.cwd()
             self.fig.savefig(fname=Path(save_dir / filename), format="png")
             print(f"Image saved as {filename} at {save_dir}")
+
+
+class SystemCurve:
+    def __init__(self, name, flow, head):
+        self.name = name
+        self.flow = flow
+        self.head = head
